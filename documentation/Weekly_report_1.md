@@ -1,10 +1,11 @@
 # Week 1
 
-Used hours during week 1:  3 hours
+Used hours during week 1:  4 hours
 
 ## Events of week 1
  * Development environment has been set up
  * Project has been created
+ * Some research on pathfinding algorithms has been done
  * Basic definition for the project written
  
 ## Problems
