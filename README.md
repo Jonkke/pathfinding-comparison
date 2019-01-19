@@ -4,4 +4,4 @@ A project conducted as part of a university course. Used to test pathfinding alg
 
 ## Documentation
 
-### [Project definition](https://github.com/Jonkke/pathfinding-comparison/documentation/definition.md)
+### [Project definition](https://github.com/Jonkke/pathfinding-comparison/blob/master/documentation/definition.md)
