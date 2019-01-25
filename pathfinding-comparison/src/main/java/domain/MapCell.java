@@ -17,8 +17,9 @@
 package domain;
 
 /**
- * This class represents a single cell in a map. Map cells are the
- * building blocks of the map, and all movement happens between them.
+ * A class representing a single cell in a map. 
+ * 
+ * Map cells are the building blocks of the map, and all movement happens between them.
  * A map cell holds a list of edges to all adjacent cells (left,up,right,down)
  * that are accessible (i.e. empty or "navigable" cells). The cell material
  * dictates if the cell is accessible, and also if the movement is constrained
@@ -26,15 +27,22 @@ package domain;
  * 
  * @author Jonkke
  */
-public class MapCell {
+public class MapCell implements Comparable<MapCell> {
     public int material; // 0 = empty, 1 = wall. For now...
     public MapCellEdge[] edges; // left, top, right, bottom
+    public int weight; // Helper variable for determining distance from starting point
+    public boolean isTested;;
     
     public MapCell(int material) {
         this.material = material;
         this.edges = new MapCellEdge[4];
+        this.weight = Integer.MAX_VALUE;
+        this.isTested = false;
     }
     
+    public boolean isTraversable() {
+        return this.material == 0;
+    }
     
     // For testing
     public int edgeCount() {
@@ -43,6 +51,11 @@ public class MapCell {
             if (e != null) count++;
         }
         return count;
+    }
+
+    @Override
+    public int compareTo(MapCell c) {
+        return Integer.compare(this.weight, c.weight);
     }
     
 }

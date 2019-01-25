@@ -5,6 +5,8 @@
  */
 
 import domain.Map;
+import domain.MapCell;
+import java.util.ArrayList;
 
 /**
  *
@@ -13,7 +15,12 @@ import domain.Map;
 public class Main {
 
     public static void main(String[] args) {
-        Map map = new Map(5, 5, 0.40, 1337);
+        Map map = new Map(10, 10, 0.10, 1337);
+        Dijkstra d = new Dijkstra();
+        ArrayList<MapCell> route = d.findShortest(map, 0, 0, 9, 9);
+        for (MapCell mc : route) {
+            mc.material = 9;
+        }
         System.out.println(map.toString());
     }
 

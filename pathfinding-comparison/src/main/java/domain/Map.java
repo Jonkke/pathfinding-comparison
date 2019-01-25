@@ -29,7 +29,7 @@ import java.util.Random;
  */
 public class Map {
 
-    MapCell[][] cells; // y,x
+    private MapCell[][] cells; // y,x
 
     public Map(MapCell[][] cells) {
         this.cells = cells;
@@ -99,6 +99,10 @@ public class Map {
             }
         }
     }
+    
+    public MapCell getCell(int x, int y) {
+        return this.cells[y][x];
+    }
 
     /**
      * @return ASCII representation of the map
@@ -108,7 +112,7 @@ public class Map {
         StringBuilder asciiMap = new StringBuilder();
         for (int y = 0; y < this.cells.length; y++) {
             for (int x = 0; x < this.cells[y].length; x++) {
-                String m = this.cells[y][x].material == 0 ? "." : "X";
+                String m = this.cells[y][x].material == 0 ? "." : this.cells[y][x].material == 9 ? "*" : "X";
                 asciiMap.append(m);
                 if (x < this.cells[y].length - 1) {
                     asciiMap.append(" ");
