@@ -45,18 +45,23 @@ public class Dijkstra {
      * @param x2
      * @param y2
      * @return Ordered list of map cells that make up the shortest path. If either
-     * start or target is a non-searchable cell (e.g. wall), then a null will be returned.
+     * start or target is a non-searchable cell (e.g. wall), or a route does not exist,
+     * then an empty list will be returned.
      */
-    public ArrayList<MapCell> findShortest(Map map, int x1, int y1, int x2, int y2) {
+    public ArrayList<MapCell> findShortestPath(Map map, int x1, int y1, int x2, int y2) {
         if (!map.getCell(x1, y1).isTraversable() || !map.getCell(x2, y2).isTraversable()) {
-            return null;
+            return new ArrayList<MapCell>(); // Start or end of route blocked by wall => empty list
         }
         MapCell start = map.getCell(x1, y1);
         start.weight = 0;
+        boolean routeFound = false;
         PriorityQueue<MapCell> pq = new PriorityQueue();
         pq.add(start);
         while (!pq.isEmpty()) {
             MapCell cell = pq.poll();
+            if (cell == map.getCell(x2, y2)) {
+                routeFound = true;
+            }
             if (cell.isTested) continue;
             cell.isTested = true;
             for (MapCellEdge mce : cell.edges) {
@@ -70,7 +75,9 @@ public class Dijkstra {
             }
         }
         
+        // If a route was found, trace it back from the target and return traversed cells as list
         ArrayList<MapCell> route = new ArrayList();
+        if (!routeFound) return route; // Route not fonud => empty list
         MapCell curr = map.getCell(x2, y2);
         while (curr != map.getCell(x1, y1)) {
             int shortestDist = Integer.MAX_VALUE;

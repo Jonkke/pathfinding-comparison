@@ -20,7 +20,8 @@ import java.util.Random;
 
 /**
  *
- * This class represents a testable map. It holds constructor methods for generating an
+ * This class represents a testable map. 
+ * It holds constructor methods for generating an
  * empty map or a random map, and a method for generating a map from file will
  * be added as well in the future. Map can also be presented in ASCII form using
  * the toString method.

@@ -15,9 +15,9 @@ import java.util.ArrayList;
 public class Main {
 
     public static void main(String[] args) {
-        Map map = new Map(10, 10, 0.10, 1337);
+        Map map = new Map(5, 5, 0.63, 1337);
         Dijkstra d = new Dijkstra();
-        ArrayList<MapCell> route = d.findShortest(map, 0, 0, 9, 9);
+        ArrayList<MapCell> route = d.findShortestPath(map, 0, 0, 4, 4);
         for (MapCell mc : route) {
             mc.material = 9;
         }

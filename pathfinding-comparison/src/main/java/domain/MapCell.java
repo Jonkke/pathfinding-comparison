@@ -28,7 +28,7 @@ package domain;
  * @author Jonkke
  */
 public class MapCell implements Comparable<MapCell> {
-    public int material; // 0 = empty, 1 = wall. For now...
+    public int material; // 0 = empty, 1 = wall, 9 = part of a route. For now...
     public MapCellEdge[] edges; // left, top, right, bottom
     public int weight; // Helper variable for determining distance from starting point
     public boolean isTested;;
