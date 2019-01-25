@@ -12,7 +12,7 @@ At least Dijkstra's algorithm and the more advanced A* algorithm (possibly with 
 
 The target time complexities for the algorithms will be those calculated for Dijkstra and A* algorithms (possibly others with their own respective time complexities...). That is, the worst-case performance of O(E + V\*log(V)) for Dijkstra, and the same for A\* (in the case that every node on the map needs to be searched).
 
-The space requirement will be O(E) for storing the map in memory. The algorithms themselves will also need to store the map in memory for processing (list of node edges in a heap for Dijkstra, for example).
+The space requirement will be O(V + E) for storing the map in memory. The algorithms themselves will also need to store the map in memory for processing (list of node edges in a heap for Dijkstra, for example).
 
 ## Input / Output
 
