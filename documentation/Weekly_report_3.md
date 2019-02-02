@@ -18,10 +18,10 @@ Nothing at the moment, I'm pretty clear on what to do.
 ## Next week
 
 TODO:
--Base data structures:
-  -PriorityQueue
-  -ArrayList
--Importing of maps
--More and better tests
--GUI
--Refactoring & commenting of code to make it more sensible
+* Base data structures:
+  * PriorityQueue
+  * ArrayList
+* Importing of maps
+* More and better tests
+* GUI
+* Refactoring & commenting of code to make it more sensible
