@@ -27,13 +27,17 @@ package domain;
  * 
  * @author Jonkke
  */
+
 public class MapCell implements Comparable<MapCell> {
-    public int material; // 0 = empty, 1 = wall, 9 = part of a route. For now...
+    public int x, y;
+    public Material material;
     public MapCellEdge[] edges; // left, top, right, bottom
     public int weight; // Helper variable for determining distance from starting point
     public boolean isTested;;
     
-    public MapCell(int material) {
+    public MapCell(int x, int y, Material material) {
+        this.x = x;
+        this.y = y;
         this.material = material;
         this.edges = new MapCellEdge[4];
         this.weight = Integer.MAX_VALUE;
@@ -41,7 +45,7 @@ public class MapCell implements Comparable<MapCell> {
     }
     
     public boolean isTraversable() {
-        return this.material == 0;
+        return this.material != Material.WALL;
     }
     
     // For testing

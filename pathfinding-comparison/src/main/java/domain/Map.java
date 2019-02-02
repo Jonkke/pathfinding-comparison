@@ -48,7 +48,7 @@ public class Map {
         this.cells = new MapCell[height][width];
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                this.cells[y][x] = new MapCell(0);
+                this.cells[y][x] = new MapCell(x, y, Material.EMPTY);
             }
         }
         generateEdges();
@@ -69,9 +69,9 @@ public class Map {
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 if (r.nextDouble() < wallOdds) {
-                    this.cells[y][x] = new MapCell(1);
+                    this.cells[y][x] = new MapCell(x, y, Material.WALL);
                 } else {
-                    this.cells[y][x] = new MapCell(0);
+                    this.cells[y][x] = new MapCell(x, y, Material.EMPTY);
                 }
             }
         }
@@ -82,19 +82,19 @@ public class Map {
     private void generateEdges() {
         for (int y = 0; y < this.cells.length; y++) {
             for (int x = 0; x < this.cells[y].length; x++) {
-                if (this.cells[y][x].material == 1) {
+                if (this.cells[y][x].material == Material.WALL) {
                     continue;
                 }
-                if (x > 0 && this.cells[y][x - 1].material == 0) {
+                if (x > 0 && this.cells[y][x - 1].material == Material.EMPTY) {
                     this.cells[y][x].edges[0] = new MapCellEdge(this.cells[y][x], this.cells[y][x - 1], 1);
                 }
-                if (y > 0 && this.cells[y - 1][x].material == 0) {
+                if (y > 0 && this.cells[y - 1][x].material == Material.EMPTY) {
                     this.cells[y][x].edges[1] = new MapCellEdge(this.cells[y][x], this.cells[y - 1][x], 1);
                 }
-                if (x < this.cells[y].length - 1 && this.cells[y][x + 1].material == 0) {
+                if (x < this.cells[y].length - 1 && this.cells[y][x + 1].material == Material.EMPTY) {
                     this.cells[y][x].edges[2] = new MapCellEdge(this.cells[y][x], this.cells[y][x + 1], 1);
                 }
-                if (y < this.cells.length - 1 && this.cells[y + 1][x].material == 0) {
+                if (y < this.cells.length - 1 && this.cells[y + 1][x].material == Material.EMPTY) {
                     this.cells[y][x].edges[3] = new MapCellEdge(this.cells[y][x], this.cells[y + 1][x], 1);
                 }
             }
@@ -113,7 +113,11 @@ public class Map {
         StringBuilder asciiMap = new StringBuilder();
         for (int y = 0; y < this.cells.length; y++) {
             for (int x = 0; x < this.cells[y].length; x++) {
-                String m = this.cells[y][x].material == 0 ? "." : this.cells[y][x].material == 9 ? "*" : "X";
+                String m = this.cells[y][x].material == Material.EMPTY ? "." : 
+                           this.cells[y][x].material == Material.WALL ? "X" : 
+                           this.cells[y][x].material == Material.SEARCHED ? "s" :
+                           this.cells[y][x].material == Material.CANDIDATE ? "c" :
+                           this.cells[y][x].material == Material.ROUTE ? "*" : "?";
                 asciiMap.append(m);
                 if (x < this.cells[y].length - 1) {
                     asciiMap.append(" ");

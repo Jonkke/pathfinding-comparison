@@ -15,51 +15,56 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.ArrayList;
+import java.util.PriorityQueue;
 import domain.Map;
 import domain.MapCell;
 import domain.MapCellEdge;
 import domain.Material;
-import java.util.PriorityQueue;
-import java.util.ArrayList;
 
 /**
- * Dijkstra's algorithm for shortest path.
- * This class is a container for the Dijkstra's algorithm, which can be used
- * to find the shortest possible route between two nodes in a graph, provided
- * there are no edges width negative weights anywhere in the graph. In this
- * implementation, the algorithm will find the shortest path in a grid-like
- * map consisting of x*y cells.
- * 
+ * A* algorithm for heuristically assisted pathfinding.
+ *
+ * The A* algorithm is used for pathfinding in a graph. It differs from Dijkstra
+ * in that it uses a heuristic function to assist it for deciding what direction
+ * to search next. In this implementation, the heuristic is based solely on the
+ * Manhattan distance between the current point and the goal point. This ensures
+ * that the heuristic will remain admissible, meaning that it will not
+ * over-estimate the distance to the goal point at any point. This in turn
+ * ensures that we will always find the shortest route, although in terms of
+ * algorithm effectiveness this may not be the most optimal solution.
+ *
  * @author Jonkke
  */
-public class Dijkstra {
-    
+public class AStar {
+
     /**
-     * Shortest route search using Dijkstra's algorithm.
-     * Input the map that the search is to be run on, and the starting
-     * x and y coordinates (x1,y1), then the target x and y coordinates (x2,y2).
-     * 
+     * Shortest route search using A* algorithm. Input the map that the search
+     * is to be run on, and the starting x and y coordinates (x1,y1), then the
+     * target x and y coordinates (x2,y2).
+     *
      * @param map
      * @param x1
      * @param y1
      * @param x2
      * @param y2
-     * @return Ordered list of map cells that make up the shortest path. If either
-     * start or target is a non-searchable cell (e.g. wall), or a route does not exist,
-     * then an empty list will be returned.
+     * @return Ordered list of map cells that make up the shortest path. If
+     * either start or target is a non-searchable cell (e.g. wall), or a route
+     * does not exist, then an empty list will be returned.
      */
     public ArrayList<MapCell> findShortestPath(Map map, int x1, int y1, int x2, int y2) {
         if (!map.getCell(x1, y1).isTraversable() || !map.getCell(x2, y2).isTraversable()) {
-            return new ArrayList(); // Start or end of route blocked by wall => empty list
+            return new ArrayList<>(); // Start or end of route blocked by wall => empty list
         }
-        MapCell start = map.getCell(x1, y1);
-        start.weight = 0;
         boolean routeFound = false;
+        MapCell start = map.getCell(x1, y1);
+        MapCell target = map.getCell(x2, y2);
+        start.weight = 0;
         PriorityQueue<MapCell> pq = new PriorityQueue();
         pq.add(start);
         while (!pq.isEmpty()) {
             MapCell cell = pq.poll();
-            if (cell == map.getCell(x2, y2)) {
+            if (cell == target) {
                 routeFound = true;
                 break;
             }
@@ -72,29 +77,35 @@ public class Dijkstra {
 //            } catch (InterruptedException ie) {
 //                System.out.println(ie);
 //            }
-            
+
             for (MapCellEdge mce : cell.edges) {
-                if (mce == null) continue;
-                int currentDistance = mce.to.weight;
-                int updatedDistance = cell.weight + mce.cost;
-                if (updatedDistance < currentDistance) {
-                    mce.to.weight = updatedDistance;
+                if (mce == null) {
+                    continue;
+                }
+                int currentCost = mce.to.weight;
+                int updatedCost = cell.weight + mce.cost;
+                if (updatedCost < currentCost) {
+                    mce.to.weight = updatedCost + getManhattanDistance(mce.to.x, mce.to.y, target.x, target.y);
                     pq.add(mce.to);
                     mce.to.material = Material.CANDIDATE;
                 }
             }
         }
-        
+
         // If a route was found, trace it back from the target and return traversed cells as list
         ArrayList<MapCell> route = new ArrayList();
-        if (!routeFound) return route; // Route not fonud => empty list
+        if (!routeFound) {
+            return route; // Route not fonud => empty list
+        }
         MapCell curr = map.getCell(x2, y2);
         while (curr != map.getCell(x1, y1)) {
-            int shortestDist = Integer.MAX_VALUE;
+            double shortestDist = Integer.MAX_VALUE;
             MapCell shortest = null;
             MapCell last = null;
             for (MapCellEdge mce : curr.edges) {
-                if (mce == null) continue;
+                if (mce == null) {
+                    continue;
+                }
                 if (mce.to != last && mce.to.weight < shortestDist) {
                     shortestDist = mce.to.weight;
                     shortest = mce.to;
@@ -105,8 +116,13 @@ public class Dijkstra {
             curr = shortest;
         }
         route.add(curr);
-        
+
         return route;
     }
-    
+
+    private int getManhattanDistance(int x1, int y1, int x2, int y2) {
+        int xDiff = Math.abs(x2 - x1);
+        int yDiff = Math.abs(y2 - y1);
+        return xDiff + yDiff;
+    }
 }
