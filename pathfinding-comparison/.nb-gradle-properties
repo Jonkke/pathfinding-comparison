@@ -5,4 +5,10 @@
     <name>gpl30</name>
     <property name="organization"/>
   </license-header>
+  <auxiliary>
+    <spellchecker-wordlist xmlns="http://www.netbeans.org/ns/spellchecker-wordlist/1">
+      <word>movingai</word>
+      <word>unpassable</word>
+    </spellchecker-wordlist>
+  </auxiliary>
 </gradle-project-properties>

@@ -16,15 +16,18 @@
  */
 package domain;
 
+import java.nio.file.Files;
+import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.Random;
+import java.util.Scanner;
 
 /**
  *
- * This class represents a testable map. 
- * It holds constructor methods for generating an
- * empty map or a random map, and a method for generating a map from file will
- * be added as well in the future. Map can also be presented in ASCII form using
- * the toString method.
+ * This class represents a testable map. It holds constructor methods for
+ * generating an empty map or a random map, and a method for generating a map
+ * from a file. Map can also be presented in ASCII form using the toString
+ * method.
  *
  * @author Jonkke
  */
@@ -34,6 +37,63 @@ public class Map {
 
     public Map(MapCell[][] cells) {
         this.cells = cells;
+        generateEdges();
+    }
+
+    /**
+     * Generate a map from file.
+     *
+     * This method allows the generation of maps from a file. It has been
+     * designed to support game maps that can be found on movingai.com site.
+     *
+     * It expects the map to be in the following format: First four lines:
+     *
+     * type octile height x width y map
+     *
+     * The rest will be an ASCII grid representing a map. Upper-left corner is
+     * at (0,0). The ASCII maps consist of the following characters:
+     *
+     * . - passable terrain G - passable terrain
+     *
+     * @ - out of bounds O - out of bounds T - trees (unpassable) S - swamp
+     * (passable from regular terrain) W - water (traversable, but not passable
+     * from terrain)
+     *
+     * @param path relative path to the map file
+     */
+    public Map(String path) {
+        String rawMap = "";
+        try {
+            byte[] encoded = Files.readAllBytes(Paths.get(path));
+            rawMap = new String(encoded, "utf-8");
+        } catch (IOException ioe) {
+            System.out.println(ioe);
+        }
+        Scanner sc = new Scanner(rawMap);
+        sc.nextLine();
+        int height = Integer.parseInt(sc.nextLine().split(" ")[1]);
+        int width = Integer.parseInt(sc.nextLine().split(" ")[1]);
+        sc.nextLine();
+
+        this.cells = new MapCell[height][width];
+        int y = 0;
+        while (sc.hasNextLine()) {
+            String line = sc.nextLine();
+            int x = 0;
+            for (int i = 0; i < line.length(); i++) {
+                char c = line.charAt(i);
+                Material mat = c == '.' ? Material.EMPTY
+                        : c == 'G' ? Material.EMPTY
+                                : c == '@' ? Material.WALL
+                                        : c == 'O' ? Material.WALL
+                                                : c == 'S' ? Material.EMPTY
+                                                        : c == 'W' ? Material.EMPTY : Material.WALL;
+                this.cells[y][x] = new MapCell(x, y, mat);
+                x++;
+            }
+            y++;
+        }
+        sc.close();
         generateEdges();
     }
 
@@ -100,7 +160,7 @@ public class Map {
             }
         }
     }
-    
+
     public MapCell getCell(int x, int y) {
         return this.cells[y][x];
     }
@@ -113,11 +173,11 @@ public class Map {
         StringBuilder asciiMap = new StringBuilder();
         for (int y = 0; y < this.cells.length; y++) {
             for (int x = 0; x < this.cells[y].length; x++) {
-                String m = this.cells[y][x].material == Material.EMPTY ? "." : 
-                           this.cells[y][x].material == Material.WALL ? "X" : 
-                           this.cells[y][x].material == Material.SEARCHED ? "s" :
-                           this.cells[y][x].material == Material.CANDIDATE ? "c" :
-                           this.cells[y][x].material == Material.ROUTE ? "*" : "?";
+                String m = this.cells[y][x].material == Material.EMPTY ? "."
+                        : this.cells[y][x].material == Material.WALL ? "X"
+                                : this.cells[y][x].material == Material.SEARCHED ? "s"
+                                        : this.cells[y][x].material == Material.CANDIDATE ? "c"
+                                                : this.cells[y][x].material == Material.ROUTE ? "*" : "?";
                 asciiMap.append(m);
                 if (x < this.cells[y].length - 1) {
                     asciiMap.append(" ");
