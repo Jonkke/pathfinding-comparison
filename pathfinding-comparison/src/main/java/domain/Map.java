@@ -32,13 +32,9 @@ import java.util.Scanner;
  * @author Jonkke
  */
 public class Map {
-
-    private MapCell[][] cells; // y,x
-
-    public Map(MapCell[][] cells) {
-        this.cells = cells;
-        generateEdges();
-    }
+    
+    public Material[][] cleanMats; // Reset map materials to this
+    public MapCell[][] cells; // y,x
 
     /**
      * Generate a map from file.
@@ -54,7 +50,6 @@ public class Map {
      * at (0,0). The ASCII maps consist of the following characters:
      *
      * . - passable terrain G - passable terrain
-     *
      * @ - out of bounds O - out of bounds T - trees (unpassable) S - swamp
      * (passable from regular terrain) W - water (traversable, but not passable
      * from terrain)
@@ -76,18 +71,38 @@ public class Map {
         sc.nextLine();
 
         this.cells = new MapCell[height][width];
+        this.cleanMats = new Material[height][width];
+
         int y = 0;
         while (sc.hasNextLine()) {
             String line = sc.nextLine();
             int x = 0;
             for (int i = 0; i < line.length(); i++) {
                 char c = line.charAt(i);
-                Material mat = c == '.' ? Material.EMPTY
-                        : c == 'G' ? Material.EMPTY
-                                : c == '@' ? Material.WALL
-                                        : c == 'O' ? Material.WALL
-                                                : c == 'S' ? Material.EMPTY
-                                                        : c == 'W' ? Material.EMPTY : Material.WALL;
+                Material mat;
+                switch(c){
+                    case '.':
+                        mat = Material.EMPTY;
+                        break;
+                    case 'G':
+                        mat = Material.EMPTY;
+                        break;
+                    case '@':
+                        mat = Material.WALL;
+                        break;
+                    case 'O':
+                        mat = Material.WALL;
+                        break;
+                    case 'S':
+                        mat = Material.EMPTY;
+                        break;
+                    case 'W':
+                        mat = Material.EMPTY;
+                        break;
+                    default:
+                        mat = Material.WALL;
+                }
+                this.cleanMats[y][x] = mat;
                 this.cells[y][x] = new MapCell(x, y, mat);
                 x++;
             }
@@ -106,6 +121,7 @@ public class Map {
      */
     public Map(int width, int height) {
         this.cells = new MapCell[height][width];
+        this.cleanMats = new Material[height][width];
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 this.cells[y][x] = new MapCell(x, y, Material.EMPTY);
@@ -126,16 +142,30 @@ public class Map {
     public Map(int width, int height, double wallOdds, int seed) {
         Random r = new Random(seed);
         this.cells = new MapCell[height][width];
+        this.cleanMats = new Material[height][width];
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 if (r.nextDouble() < wallOdds) {
                     this.cells[y][x] = new MapCell(x, y, Material.WALL);
                 } else {
-                    this.cells[y][x] = new MapCell(x, y, Material.EMPTY);
                 }
+                    this.cells[y][x] = new MapCell(x, y, Material.EMPTY);
             }
         }
         generateEdges();
+    }
+    
+    /**
+     * Reset map materials after searches with this method
+     */
+    public void resetMap() {
+        for (int y = 0; y < this.cells.length; y++) {
+            for (int x = 0; x < this.cells[y].length; x++) {
+                this.cells[y][x].material = this.cleanMats[y][x];
+                this.cells[y][x].isTested = false;
+                this.cells[y][x].weight = Integer.MAX_VALUE;
+            }
+        }
     }
 
     // This method will resolve the connections between map cells
@@ -173,9 +203,9 @@ public class Map {
         StringBuilder asciiMap = new StringBuilder();
         for (int y = 0; y < this.cells.length; y++) {
             for (int x = 0; x < this.cells[y].length; x++) {
-                String m = this.cells[y][x].material == Material.EMPTY ? "."
+                String m = this.cells[y][x].material == Material.EMPTY ? " "
                         : this.cells[y][x].material == Material.WALL ? "X"
-                                : this.cells[y][x].material == Material.SEARCHED ? "s"
+                                : this.cells[y][x].material == Material.SEARCHED ? "."
                                         : this.cells[y][x].material == Material.CANDIDATE ? "c"
                                                 : this.cells[y][x].material == Material.ROUTE ? "*" : "?";
                 asciiMap.append(m);

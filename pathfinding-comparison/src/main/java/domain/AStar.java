@@ -1,3 +1,5 @@
+package domain;
+
 /*
  * Copyright (C) 2019 
  *
@@ -14,13 +16,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 import java.util.ArrayList;
 import java.util.PriorityQueue;
 import domain.Map;
 import domain.MapCell;
 import domain.MapCellEdge;
 import domain.Material;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * A* algorithm for heuristically assisted pathfinding.
@@ -52,7 +55,7 @@ public class AStar {
      * either start or target is a non-searchable cell (e.g. wall), or a route
      * does not exist, then an empty list will be returned.
      */
-    public ArrayList<MapCell> findShortestPath(Map map, int x1, int y1, int x2, int y2) {
+    public ArrayList<MapCell> findShortestPath(Map map, int x1, int y1, int x2, int y2, Runnable updateFn) {
         if (!map.getCell(x1, y1).isTraversable() || !map.getCell(x2, y2).isTraversable()) {
             return new ArrayList<>(); // Start or end of route blocked by wall => empty list
         }
@@ -68,15 +71,19 @@ public class AStar {
                 routeFound = true;
                 break;
             }
-            if (cell.isTested) continue;
+            if (cell.isTested) {
+                continue;
+            }
             cell.isTested = true;
             cell.material = Material.SEARCHED;
-//            System.out.println(map.toString()); // remove
-//            try {
-//                Thread.sleep(50);
-//            } catch (InterruptedException ie) {
-//                System.out.println(ie);
-//            }
+            if (updateFn != null) {
+                try {
+                    Thread.sleep(1);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(Dijkstra.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                updateFn.run();
+            }
 
             for (MapCellEdge mce : cell.edges) {
                 if (mce == null) {
