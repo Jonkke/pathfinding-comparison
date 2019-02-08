@@ -32,7 +32,7 @@ import java.util.Scanner;
  * @author Jonkke
  */
 public class Map {
-    
+
     public Material[][] cleanMats; // Reset map materials to this
     public MapCell[][] cells; // y,x
 
@@ -50,6 +50,7 @@ public class Map {
      * at (0,0). The ASCII maps consist of the following characters:
      *
      * . - passable terrain G - passable terrain
+     *
      * @ - out of bounds O - out of bounds T - trees (unpassable) S - swamp
      * (passable from regular terrain) W - water (traversable, but not passable
      * from terrain)
@@ -80,7 +81,7 @@ public class Map {
             for (int i = 0; i < line.length(); i++) {
                 char c = line.charAt(i);
                 Material mat;
-                switch(c){
+                switch (c) {
                     case '.':
                         mat = Material.EMPTY;
                         break;
@@ -146,15 +147,17 @@ public class Map {
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 if (r.nextDouble() < wallOdds) {
+                    this.cleanMats[y][x] = Material.WALL;
                     this.cells[y][x] = new MapCell(x, y, Material.WALL);
                 } else {
-                }
+                    this.cleanMats[y][x] = Material.EMPTY;
                     this.cells[y][x] = new MapCell(x, y, Material.EMPTY);
+                }
             }
         }
         generateEdges();
     }
-    
+
     /**
      * Reset map materials after searches with this method
      */
@@ -163,7 +166,7 @@ public class Map {
             for (int x = 0; x < this.cells[y].length; x++) {
                 this.cells[y][x].material = this.cleanMats[y][x];
                 this.cells[y][x].isTested = false;
-                this.cells[y][x].weight = Integer.MAX_VALUE;
+                this.cells[y][x].costSoFar = Integer.MAX_VALUE;
             }
         }
     }
@@ -203,7 +206,7 @@ public class Map {
         StringBuilder asciiMap = new StringBuilder();
         for (int y = 0; y < this.cells.length; y++) {
             for (int x = 0; x < this.cells[y].length; x++) {
-                String m = this.cells[y][x].material == Material.EMPTY ? " "
+                String m = this.cells[y][x].material == Material.EMPTY ? "."
                         : this.cells[y][x].material == Material.WALL ? "X"
                                 : this.cells[y][x].material == Material.SEARCHED ? "."
                                         : this.cells[y][x].material == Material.CANDIDATE ? "c"

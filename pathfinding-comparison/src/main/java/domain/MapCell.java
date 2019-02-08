@@ -32,34 +32,26 @@ public class MapCell implements Comparable<MapCell> {
     public int x, y;
     public Material material;
     public MapCellEdge[] edges; // left, top, right, bottom
-    public int weight; // Helper variable for determining distance from starting point
-    public boolean isTested;;
+    public double costSoFar; // Helper variable for determining distance from starting point
+    public double priority;
+    public boolean isTested;
     
     public MapCell(int x, int y, Material material) {
         this.x = x;
         this.y = y;
         this.material = material;
         this.edges = new MapCellEdge[4];
-        this.weight = Integer.MAX_VALUE;
+        this.costSoFar = Double.MAX_VALUE;
         this.isTested = false;
     }
     
     public boolean isTraversable() {
         return this.material != Material.WALL;
     }
-    
-    // For testing
-    public int edgeCount() {
-        int count = 0;
-        for (MapCellEdge e: this.edges) {
-            if (e != null) count++;
-        }
-        return count;
-    }
 
     @Override
     public int compareTo(MapCell c) {
-        return Integer.compare(this.weight, c.weight);
+        return Double.compare(this.priority, c.priority);
     }
     
 }

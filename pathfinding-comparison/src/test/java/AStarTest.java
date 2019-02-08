@@ -34,28 +34,28 @@ public class AStarTest {
     @Test
     public void testRouteExists() {
         map = new Map(5, 5, 0.63, 1337);
-        ArrayList<MapCell> path = as.findShortestPath(map, 0, 0, 4, 4, null);
+        ArrayList<MapCell> path = as.findShortestPath(map, 0, 0, 4, 4, false, null);
         assertEquals(path.size(), 9);
     }
 
     @Test
     public void testRouteDoesNotExist() {
         map = new Map(5, 5, 0.64, 1337);
-        ArrayList<MapCell> path = as.findShortestPath(map, 0, 0, 4, 4, null);
+        ArrayList<MapCell> path = as.findShortestPath(map, 0, 0, 4, 4, false, null);
         assertEquals(path.size(), 0);
     }
 
     @Test
     public void testRouteStartBlocked() {
         map = new Map(5, 5, 0.63, 1337);
-        ArrayList<MapCell> path = as.findShortestPath(map, 1, 1, 4, 4, null);
+        ArrayList<MapCell> path = as.findShortestPath(map, 1, 1, 4, 4, false, null);
         assertEquals(path.size(), 0);
     }
 
     @Test
     public void testRouteEndBlocked() {
         map = new Map(5, 5, 0.63, 1337);
-        ArrayList<MapCell> path = as.findShortestPath(map, 0, 0, 3, 4, null);
+        ArrayList<MapCell> path = as.findShortestPath(map, 0, 0, 3, 4, false, null);
         assertEquals(path.size(), 0);
     }
 

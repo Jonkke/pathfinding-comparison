@@ -18,10 +18,6 @@ package domain;
  */
 import java.util.ArrayList;
 import java.util.PriorityQueue;
-import domain.Map;
-import domain.MapCell;
-import domain.MapCellEdge;
-import domain.Material;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -41,6 +37,9 @@ import java.util.logging.Logger;
  */
 public class AStar {
 
+    int startX;
+    int startY;
+
     /**
      * Shortest route search using A* algorithm. Input the map that the search
      * is to be run on, and the starting x and y coordinates (x1,y1), then the
@@ -51,22 +50,28 @@ public class AStar {
      * @param y1
      * @param x2
      * @param y2
+     * @param useCrossProduct Dictates whether or not to use cross product
+     * tie-breaking (results in more straight-looking paths)
+     * @param updateFn This is a callback function for the UI system, used for
+     * visualizing the algorithms progression
      * @return Ordered list of map cells that make up the shortest path. If
      * either start or target is a non-searchable cell (e.g. wall), or a route
      * does not exist, then an empty list will be returned.
      */
-    public ArrayList<MapCell> findShortestPath(Map map, int x1, int y1, int x2, int y2, Runnable updateFn) {
+    public ArrayList<MapCell> findShortestPath(Map map, int x1, int y1, int x2, int y2, boolean useCrossProduct, Runnable updateFn) {
+        this.startX = x1;
+        this.startY = y1;
         if (!map.getCell(x1, y1).isTraversable() || !map.getCell(x2, y2).isTraversable()) {
             return new ArrayList<>(); // Start or end of route blocked by wall => empty list
         }
         boolean routeFound = false;
         MapCell start = map.getCell(x1, y1);
         MapCell target = map.getCell(x2, y2);
-        start.weight = 0;
-        PriorityQueue<MapCell> pq = new PriorityQueue();
-        pq.add(start);
-        while (!pq.isEmpty()) {
-            MapCell cell = pq.poll();
+        start.costSoFar = 0;
+        MapCellBinaryHeap mcbh = new MapCellBinaryHeap();
+        mcbh.add(start);
+        while (!mcbh.isEmpty()) {
+            MapCell cell = mcbh.poll();
             if (cell == target) {
                 routeFound = true;
                 break;
@@ -76,6 +81,8 @@ public class AStar {
             }
             cell.isTested = true;
             cell.material = Material.SEARCHED;
+
+            // Callback to passed update function is made here, if it was passed to us
             if (updateFn != null) {
                 try {
                     Thread.sleep(1);
@@ -86,14 +93,18 @@ public class AStar {
             }
 
             for (MapCellEdge mce : cell.edges) {
-                if (mce == null) {
+                if (mce == null || mce.to.isTested) {
                     continue;
                 }
-                int currentCost = mce.to.weight;
-                int updatedCost = cell.weight + mce.cost;
-                if (updatedCost < currentCost) {
-                    mce.to.weight = updatedCost + getManhattanDistance(mce.to.x, mce.to.y, target.x, target.y);
-                    pq.add(mce.to);
+                double currentCost = mce.to.costSoFar;
+                double updatedCost = cell.costSoFar + mce.cost;
+                if (!mce.to.isTested || updatedCost < currentCost) {
+                    mce.to.costSoFar = updatedCost;
+                    double h = useCrossProduct
+                            ? getCrossProduct(mce.to.x, mce.to.y, target.x, target.y)
+                            : getManhattanDistance(mce.to.x, mce.to.y, target.x, target.y);
+                    mce.to.priority = updatedCost + h;
+                    mcbh.add(mce.to);
                     mce.to.material = Material.CANDIDATE;
                 }
             }
@@ -102,7 +113,7 @@ public class AStar {
         // If a route was found, trace it back from the target and return traversed cells as list
         ArrayList<MapCell> route = new ArrayList();
         if (!routeFound) {
-            return route; // Route not fonud => empty list
+            return route; // Route not found => empty list
         }
         MapCell curr = map.getCell(x2, y2);
         while (curr != map.getCell(x1, y1)) {
@@ -113,8 +124,8 @@ public class AStar {
                 if (mce == null) {
                     continue;
                 }
-                if (mce.to != last && mce.to.weight < shortestDist) {
-                    shortestDist = mce.to.weight;
+                if (mce.to != last && mce.to.costSoFar < shortestDist) {
+                    shortestDist = mce.to.costSoFar;
                     shortest = mce.to;
                 }
             }
@@ -127,9 +138,19 @@ public class AStar {
         return route;
     }
 
-    private int getManhattanDistance(int x1, int y1, int x2, int y2) {
+    private double getManhattanDistance(int x1, int y1, int x2, int y2) {
         int xDiff = Math.abs(x2 - x1);
         int yDiff = Math.abs(y2 - y1);
-        return xDiff + yDiff;
+        int dist = (xDiff + yDiff);
+        return dist;
+    }
+
+    private double getCrossProduct(int x1, int y1, int x2, int y2) {
+        int currX = x1 - x2;
+        int currY = y1 - y2;
+        int fromStartX = this.startX - x2;
+        int fromStartY = this.startY - y2;
+        int cross = Math.abs(currX * fromStartY - fromStartX * currY);
+        return cross; // * 1.01;
     }
 }

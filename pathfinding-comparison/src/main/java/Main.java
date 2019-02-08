@@ -8,7 +8,9 @@ import domain.Map;
 import domain.MapCell;
 import domain.Material;
 import UI.UI;
+import domain.MapCellBinaryHeap;
 import java.util.ArrayList;
+import java.util.Random;
 
 /**
  *
@@ -18,7 +20,7 @@ public class Main {
 
     public static void main(String[] args) {
         UI uie = new UI();
-        uie.buildWindow();
+        uie.buildUIWindow();
 //        System.out.println("Working dir: " + System.getProperty("user.dir"));
 //        
 //        Map map = new Map(25, 25, 0.01, 1337);

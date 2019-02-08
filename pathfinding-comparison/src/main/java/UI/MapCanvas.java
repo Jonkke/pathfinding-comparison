@@ -50,6 +50,10 @@ public class MapCanvas extends JPanel implements MouseMotionListener, MouseListe
     Map map;
     
     BiConsumer bc;
+    
+    public void setUpdateHook(BiConsumer bc) {
+        this.bc = bc;
+    }
 
     public MapCanvas(int columns, int rows) {
         this.addMouseMotionListener(this);
@@ -59,8 +63,7 @@ public class MapCanvas extends JPanel implements MouseMotionListener, MouseListe
         setPreferredSize(new Dimension(width, height));
     }
 
-    public MapCanvas(Map map, int cellWidth, int cellHeight, BiConsumer bc) {
-        this.bc = bc;
+    public MapCanvas(Map map, int cellWidth, int cellHeight) {
         this.addMouseMotionListener(this);
         this.addMouseListener(this);
         this.map = map;
@@ -127,6 +130,11 @@ public class MapCanvas extends JPanel implements MouseMotionListener, MouseListe
         drawMap(g);
         drawRoute(g);
     }
+    
+    public void update() {
+        Graphics g = getGraphics();
+        paintComponent(g);
+    }
 
     @Override
     public void mouseDragged(MouseEvent e) {
@@ -138,7 +146,8 @@ public class MapCanvas extends JPanel implements MouseMotionListener, MouseListe
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        bc.accept(e.getX()/cellWidth, e.getY()/cellHeight);
+        if (this.bc == null) return;
+        this.bc.accept(e.getX()/cellWidth, e.getY()/cellHeight);
     }
 
     @Override
