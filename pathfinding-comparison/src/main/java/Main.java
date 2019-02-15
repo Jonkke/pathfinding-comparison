@@ -8,9 +8,7 @@ import domain.Map;
 import domain.MapCell;
 import domain.Material;
 import UI.UI;
-import domain.MapCellBinaryHeap;
-import java.util.ArrayList;
-import java.util.Random;
+import domain.MapCellList;
 
 /**
  *
@@ -33,6 +31,10 @@ public class Main {
 //            mc.material = Material.ROUTE;
 //        }
 //        System.out.println(map.toString());
+    }
+
+    private static MapCellList MapCellList() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 }

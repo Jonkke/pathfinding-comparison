@@ -17,7 +17,6 @@ package domain;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import java.util.ArrayList;
-import java.util.PriorityQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
