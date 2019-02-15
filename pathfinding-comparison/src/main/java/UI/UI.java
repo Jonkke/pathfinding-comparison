@@ -20,6 +20,7 @@ import domain.AStar;
 import domain.Dijkstra;
 import domain.Map;
 import domain.MapCell;
+import domain.MapCellList;
 import domain.Material;
 import java.util.ArrayList;
 import java.util.function.BiConsumer;
@@ -53,9 +54,10 @@ public class UI {
         BiConsumer<Integer, Integer> updateDest = (x, y) -> {
             this.next = this.next == 0 ? 1 : 0;
             map.resetMap();
-//            ArrayList<MapCell> route2 = this.next == 0 ? d.findShortestPath(map, 100, 25, x, y, null) : as.findShortestPath(map, 100, 25, x, y, true, null);
-              ArrayList<MapCell> route2 = as.findShortestPath(map, 100, 25, x, y, true, null);
-            for (MapCell cell : route2) {
+//            MapCellList route2 = this.next == 0 ? d.findShortestPath(map, 100, 25, x, y, null) : as.findShortestPath(map, 100, 25, x, y, true, null);
+              MapCellList route2 = as.findShortestPath(map, 100, 25, x, y, true, null);
+            for (int i = 0; i < route2.size(); i++) {
+                MapCell cell = route2.get(i);
                 cell.material = Material.ROUTE;
             }
             mapCanvas.repaint();

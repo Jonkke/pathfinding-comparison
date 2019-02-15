@@ -4,11 +4,7 @@
  * and open the template in the editor.
  */
 
-import domain.Map;
-import domain.MapCell;
-import domain.Material;
 import UI.UI;
-import domain.MapCellList;
 
 /**
  *
@@ -32,9 +28,5 @@ public class Main {
 //        }
 //        System.out.println(map.toString());
     }
-
-    private static MapCellList MapCellList() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
+    
 }

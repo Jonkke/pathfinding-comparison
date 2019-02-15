@@ -16,7 +16,6 @@ package domain;
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -57,11 +56,11 @@ public class AStar {
      * either start or target is a non-searchable cell (e.g. wall), or a route
      * does not exist, then an empty list will be returned.
      */
-    public ArrayList<MapCell> findShortestPath(Map map, int x1, int y1, int x2, int y2, boolean useCrossProduct, Runnable updateFn) {
+    public MapCellList findShortestPath(Map map, int x1, int y1, int x2, int y2, boolean useCrossProduct, Runnable updateFn) {
         this.startX = x1;
         this.startY = y1;
         if (!map.getCell(x1, y1).isTraversable() || !map.getCell(x2, y2).isTraversable()) {
-            return new ArrayList<>(); // Start or end of route blocked by wall => empty list
+            return new MapCellList(); // Start or end of route blocked by wall => empty list
         }
         boolean routeFound = false;
         MapCell start = map.getCell(x1, y1);
@@ -110,7 +109,7 @@ public class AStar {
         }
 
         // If a route was found, trace it back from the target and return traversed cells as list
-        ArrayList<MapCell> route = new ArrayList();
+        MapCellList route = new MapCellList();
         if (!routeFound) {
             return route; // Route not found => empty list
         }
