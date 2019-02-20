@@ -37,6 +37,60 @@ public class Map {
     public MapCell[][] cells; // y,x
 
     /**
+     * Constructor for generating a map from file
+     * 
+     * @param path Path to map file
+     */
+    public Map(String path) {
+        mapFromFilePath(path);
+    }
+
+    /**
+     *
+     * Generate an empty map with this method.
+     *
+     * @param width
+     * @param height
+     */
+    public Map(int width, int height) {
+        this.cells = new MapCell[height][width];
+        this.cleanMats = new Material[height][width];
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                this.cells[y][x] = new MapCell(x, y, Material.EMPTY);
+            }
+        }
+        generateEdges();
+    }
+
+    /**
+     * Generate a random map with custom seed and a probability factor that
+     * regulates the wall occurrence.
+     *
+     * @param width
+     * @param height
+     * @param wallOdds Controls the occurrence of random wall pieces
+     * @param seed
+     */
+    public Map(int width, int height, double wallOdds, int seed) {
+        Random r = new Random(seed);
+        this.cells = new MapCell[height][width];
+        this.cleanMats = new Material[height][width];
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                if (r.nextDouble() < wallOdds) {
+                    this.cleanMats[y][x] = Material.WALL;
+                    this.cells[y][x] = new MapCell(x, y, Material.WALL);
+                } else {
+                    this.cleanMats[y][x] = Material.EMPTY;
+                    this.cells[y][x] = new MapCell(x, y, Material.EMPTY);
+                }
+            }
+        }
+        generateEdges();
+    }
+
+    /**
      * Generate a map from file.
      *
      * This method allows the generation of maps from a file. It has been
@@ -57,7 +111,7 @@ public class Map {
      *
      * @param path relative path to the map file
      */
-    public Map(String path) {
+    public void mapFromFilePath(String path) {
         String rawMap = "";
         try {
             byte[] encoded = Files.readAllBytes(Paths.get(path));
@@ -110,51 +164,6 @@ public class Map {
             y++;
         }
         sc.close();
-        generateEdges();
-    }
-
-    /**
-     *
-     * Generate an empty map with this method.
-     *
-     * @param width
-     * @param height
-     */
-    public Map(int width, int height) {
-        this.cells = new MapCell[height][width];
-        this.cleanMats = new Material[height][width];
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                this.cells[y][x] = new MapCell(x, y, Material.EMPTY);
-            }
-        }
-        generateEdges();
-    }
-
-    /**
-     * Generate a random map with custom seed and a probability factor that
-     * regulates the wall occurrence.
-     *
-     * @param width
-     * @param height
-     * @param wallOdds Controls the occurrence of random wall pieces
-     * @param seed
-     */
-    public Map(int width, int height, double wallOdds, int seed) {
-        Random r = new Random(seed);
-        this.cells = new MapCell[height][width];
-        this.cleanMats = new Material[height][width];
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                if (r.nextDouble() < wallOdds) {
-                    this.cleanMats[y][x] = Material.WALL;
-                    this.cells[y][x] = new MapCell(x, y, Material.WALL);
-                } else {
-                    this.cleanMats[y][x] = Material.EMPTY;
-                    this.cells[y][x] = new MapCell(x, y, Material.EMPTY);
-                }
-            }
-        }
         generateEdges();
     }
 

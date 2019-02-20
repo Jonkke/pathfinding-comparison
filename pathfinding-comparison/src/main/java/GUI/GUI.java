@@ -46,19 +46,21 @@ public class GUI {
      * control the application.
      */
     public void buildUIWindow() {
-        this.state = new GUIState();
-        controlPanel = new ControlPanel(state);
-//        Map map = new Map("./maps/arena2.map");
         Map map = new Map("./maps/brc000d.map");
-//        Map map = new Map(300, 300, 0.1, 2134);
         Dijkstra d = new Dijkstra();
         AStar as = new AStar();
         mapCanvas = new MapCanvas(map, 3, 3);
         
-//        Consumer<String> changeMap = (path) -> {
-//            this.map = new Map(path);
-//        };
-
+        Consumer<String> newMap = (path) -> {
+            map.resetMap();
+            this.state.resetNodes();
+            map.mapFromFilePath(path);
+            mapCanvas.repaint();
+        };
+        
+        this.state = new GUIState(newMap);
+        controlPanel = new ControlPanel(state);
+        
         BiConsumer<Integer, Integer> updateDest = (x, y) -> {
             if (this.state.nodeToSet == 1) {
                 this.state.startX = x;
@@ -103,13 +105,24 @@ public class GUI {
         int algo; // 1=Dijkstra, 2=A*
         String mapFilePath;
         
-        public GUIState() {
+        Consumer<String> mapUpdateCB;
+        
+        public GUIState(Consumer mapUpdateCB) {
             this.nodeToSet = 1;
             this.algo = 1;
+            this.mapUpdateCB = mapUpdateCB;
         }
         
         public void setMapFilePath(String path) {
             this.mapFilePath = path;
+            this.mapUpdateCB.accept(path);
+        }
+        
+        public void resetNodes() {
+            this.startX = 0;
+            this.startY = 0;
+            this.endX = 0;
+            this.endY = 0;
         }
     }
 

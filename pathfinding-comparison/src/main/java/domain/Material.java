@@ -22,5 +22,5 @@ package domain;
  * @author Jonkke
  */
 public enum Material {
-    EMPTY, WALL, SEARCHED, CANDIDATE, ROUTE, WEIGHT
+    EMPTY, SWAMP, WATER, WALL, SEARCHED, CANDIDATE, ROUTE, WEIGHT
 }
