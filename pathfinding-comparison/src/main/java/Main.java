@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-import UI.UI;
+import GUI.GUI;
 
 /**
  *
@@ -13,7 +13,7 @@ import UI.UI;
 public class Main {
 
     public static void main(String[] args) {
-        UI uie = new UI();
+        GUI uie = new GUI();
         uie.buildUIWindow();
 //        System.out.println("Working dir: " + System.getProperty("user.dir"));
 //        

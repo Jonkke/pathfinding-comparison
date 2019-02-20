@@ -14,7 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package domain;
+package DataStructures;
+
+import domain.MapCell;
 
 /**
  * This class implements a list for storing map cells, and an interface for it.

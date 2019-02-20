@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package UI;
+package GUI;
 
 import domain.Map;
 import domain.MapCell;
@@ -31,8 +31,6 @@ import javax.swing.*;
 
 import java.awt.event.MouseMotionListener;
 import java.util.function.BiConsumer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -48,9 +46,9 @@ public class MapCanvas extends JPanel implements MouseMotionListener, MouseListe
     int cellHeight = 1;
     int cellWidth = 1;
     Map map;
-    
+
     BiConsumer bc;
-    
+
     public void setUpdateHook(BiConsumer bc) {
         this.bc = bc;
     }
@@ -130,7 +128,7 @@ public class MapCanvas extends JPanel implements MouseMotionListener, MouseListe
         drawMap(g);
         drawRoute(g);
     }
-    
+
     public void update() {
         Graphics g = getGraphics();
         paintComponent(g);
@@ -146,8 +144,10 @@ public class MapCanvas extends JPanel implements MouseMotionListener, MouseListe
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        if (this.bc == null) return;
-        this.bc.accept(e.getX()/cellWidth, e.getY()/cellHeight);
+        if (this.bc == null) {
+            return;
+        }
+        this.bc.accept(e.getX() / cellWidth, e.getY() / cellHeight);
     }
 
     @Override

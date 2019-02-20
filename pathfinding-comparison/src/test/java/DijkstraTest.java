@@ -15,9 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import domain.Dijkstra;
+import Algorithms.Dijkstra;
 import domain.Map;
-import domain.MapCellList;
+import DataStructures.MapCellList;
 import org.junit.Test;
 import static org.junit.Assert.*;
 

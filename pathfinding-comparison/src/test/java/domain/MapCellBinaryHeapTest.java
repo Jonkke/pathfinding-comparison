@@ -16,6 +16,7 @@
  */
 package domain;
 
+import DataStructures.MapCellBinaryHeap;
 import java.util.Random;
 import static org.junit.Assert.assertEquals;
 import org.junit.Before;
