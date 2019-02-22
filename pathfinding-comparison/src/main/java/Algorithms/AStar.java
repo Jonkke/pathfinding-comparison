@@ -54,6 +54,7 @@ public class AStar {
      * @param y1
      * @param x2
      * @param y2
+     * @param markSearched If true, mark searched map cells with special materials
      * @param useCrossProduct Dictates whether or not to use cross product
      * tie-breaking (results in more straight-looking paths)
      * @param updateFn This is a callback function for the UI system, used for
@@ -62,7 +63,7 @@ public class AStar {
      * either start or target is a non-searchable cell (e.g. wall), or a route
      * does not exist, then an empty list will be returned.
      */
-    public MapCellList findShortestPath(Map map, int x1, int y1, int x2, int y2, boolean useCrossProduct, Runnable updateFn) {
+    public MapCellList findShortestPath(Map map, int x1, int y1, int x2, int y2, boolean markSearched, boolean useCrossProduct, Runnable updateFn) {
         this.startX = x1;
         this.startY = y1;
         if (!map.getCell(x1, y1).isTraversable() || !map.getCell(x2, y2).isTraversable()) {
@@ -84,7 +85,9 @@ public class AStar {
                 continue;
             }
             cell.isTested = true;
-            cell.material = Material.SEARCHED;
+            if (markSearched) {
+                cell.material = Material.SEARCHED;
+            }
 
             // Callback to passed update function is made here, if it was passed to us
             if (updateFn != null) {
@@ -109,7 +112,9 @@ public class AStar {
                             : getManhattanDistance(mce.to.x, mce.to.y, target.x, target.y);
                     mce.to.priority = updatedCost + h;
                     mcbh.add(mce.to);
-                    mce.to.material = Material.CANDIDATE;
+                    if (markSearched) {
+                        mce.to.material = Material.CANDIDATE;
+                    }
                 }
             }
         }

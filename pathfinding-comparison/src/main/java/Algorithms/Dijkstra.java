@@ -46,13 +46,14 @@ public class Dijkstra {
      * @param y1
      * @param x2
      * @param y2
+     * @param markSearched If true, mark searched map cells with special materials
      * @param updateFn This is a callback function for the UI system, used
      * for visualizing the algorithms progression
      * @return Ordered list of map cells that make up the shortest path. If
      * either start or target is a non-searchable cell (e.g. wall), or a route
      * does not exist, then an empty list will be returned.
      */
-    public MapCellList findShortestPath(Map map, int x1, int y1, int x2, int y2, Runnable updateFn) {
+    public MapCellList findShortestPath(Map map, int x1, int y1, int x2, int y2, boolean markSearched, Runnable updateFn) {
         if (!map.getCell(x1, y1).isTraversable() || !map.getCell(x2, y2).isTraversable()) {
             return new MapCellList(); // Start or end of route blocked by wall => empty list
         }
@@ -71,7 +72,9 @@ public class Dijkstra {
                 continue;
             }
             cell.isTested = true;
-            cell.material = Material.SEARCHED;
+            if (markSearched) {
+                cell.material = Material.SEARCHED;
+            }
             if (updateFn != null) {
                 try {
                     Thread.sleep(1);
@@ -91,7 +94,9 @@ public class Dijkstra {
                     mce.to.costSoFar = updatedDistance;
                     mce.to.priority = updatedDistance;
                     mcbh.add(mce.to);
-                    mce.to.material = Material.CANDIDATE;
+                    if (markSearched) {
+                        mce.to.material = Material.CANDIDATE;
+                    }
                 }
             }
         }

@@ -46,16 +46,18 @@ public class GUI {
      * control the application.
      */
     public void buildUIWindow() {
-        Map map = new Map("./maps/brc000d.map");
+        Map map = new Map(1024, 1024);
         Dijkstra d = new Dijkstra();
         AStar as = new AStar();
-        mapCanvas = new MapCanvas(map, 3, 3);
+        mapCanvas = new MapCanvas(map, 1024, 1024);
         
         Consumer<String> newMap = (path) -> {
             map.resetMap();
             this.state.resetNodes();
             map.mapFromFilePath(path);
+            mapCanvas.setNewMap(map, 1024, 1024);
             mapCanvas.repaint();
+            mapCanvas.revalidate();
         };
         
         this.state = new GUIState(newMap);
@@ -72,9 +74,9 @@ public class GUI {
             map.resetMap();
             MapCellList route;
             if (state.algo == 1) {
-                route = d.findShortestPath(map, this.state.startX, this.state.startY, this.state.endX, this.state.endY, null);
+                route = d.findShortestPath(map, this.state.startX, this.state.startY, this.state.endX, this.state.endY, false, null);
             } else {
-                route = as.findShortestPath(map, this.state.startX, this.state.startY, this.state.endX, this.state.endY, false, null);
+                route = as.findShortestPath(map, this.state.startX, this.state.startY, this.state.endX, this.state.endY, false, true, null);
             }
             
             for (int i = 0; i < route.size(); i++) {
@@ -82,13 +84,15 @@ public class GUI {
                 cell.material = Material.ROUTE;
             }
             mapCanvas.repaint();
+            mapCanvas.revalidate();
         };
 
         this.mapCanvas.setUpdateHook(updateDest);
 
+        JScrollPane scrollPane = new JScrollPane(mapCanvas);
         JFrame frame = new JFrame();
         frame.setLayout(new BorderLayout());
-        frame.add(mapCanvas, BorderLayout.CENTER);
+        frame.add(scrollPane, BorderLayout.CENTER);
         frame.add(controlPanel, BorderLayout.WEST);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
@@ -96,6 +100,9 @@ public class GUI {
         frame.setVisible(true);
     }
     
+    /**
+     * This is a helper class for storing the GUI state
+     */
     class GUIState {
         int nodeToSet; // 1=start, 2=end
         int startX;

@@ -53,6 +53,17 @@ public class MapCanvas extends JPanel implements MouseMotionListener, MouseListe
         this.bc = bc;
     }
 
+    public void setNewMap(Map map, int width, int height) {
+        this.map = map;
+        this.rows = map.cells.length;
+        this.columns = map.cells[0].length;
+        this.height = height;
+        this.width = width;
+        this.cellHeight = this.height / this.rows;
+        this.cellWidth = this.width / this.rows;
+        setBackground(Color.WHITE);
+    }
+
     public MapCanvas(int columns, int rows) {
         this.addMouseMotionListener(this);
         this.columns = columns;
@@ -61,22 +72,15 @@ public class MapCanvas extends JPanel implements MouseMotionListener, MouseListe
         setPreferredSize(new Dimension(width, height));
     }
 
-    public MapCanvas(Map map, int cellWidth, int cellHeight) {
+    public MapCanvas(Map map, int width, int height) {
         this.addMouseMotionListener(this);
         this.addMouseListener(this);
-        this.map = map;
-        this.rows = map.cells.length;
-        this.columns = map.cells[0].length;
-        this.height = this.rows * cellHeight;
-        this.width = this.columns * cellWidth;
-        this.cellHeight = cellHeight;
-        this.cellWidth = cellWidth;
+        setNewMap(map, width, height);
         setBackground(Color.WHITE);
         setPreferredSize(new Dimension(this.width, this.height));
     }
 
     public void drawGrid(Graphics g) {
-        Graphics2D g2d = (Graphics2D) g;
         g.setColor(Color.BLACK);
         for (int i = 0; i < columns - 1; i++) {
             int xPos = (this.width / columns) * (i + 1);
@@ -97,6 +101,12 @@ public class MapCanvas extends JPanel implements MouseMotionListener, MouseListe
                 if (mc.material == Material.WALL) {
                     g.setColor(Color.BLACK);
                     g.fillRect(x * this.cellWidth, y * this.cellHeight, this.cellWidth, this.cellHeight);
+                } else if (mc.material == Material.SWAMP) {
+                    g.setColor(new Color(40, 40, 255));
+                    g.fillRect(x * this.cellWidth, y * this.cellHeight, this.cellWidth, this.cellHeight);
+                } else if (mc.material == Material.WATER) {
+                    g.setColor(Color.BLUE);
+                    g.fillRect(x * this.cellWidth, y * this.cellHeight, this.cellWidth, this.cellHeight);
                 } else if (mc.material == Material.SEARCHED) {
                     g.setColor(Color.GRAY);
                     g.fillRect(x * this.cellWidth, y * this.cellHeight, this.cellWidth, this.cellHeight);
@@ -115,7 +125,7 @@ public class MapCanvas extends JPanel implements MouseMotionListener, MouseListe
             for (int x = 0; x < cells[y].length; x++) {
                 MapCell mc = cells[y][x];
                 if (mc.material == Material.ROUTE) {
-                    g.setColor(Color.BLUE);
+                    g.setColor(Color.RED);
                     g.fillRect(x * this.cellWidth, y * this.cellHeight, cellWidth, cellHeight);
                 }
             }

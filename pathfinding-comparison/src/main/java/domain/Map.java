@@ -38,7 +38,7 @@ public class Map {
 
     /**
      * Constructor for generating a map from file
-     * 
+     *
      * @param path Path to map file
      */
     public Map(String path) {
@@ -149,10 +149,10 @@ public class Map {
                         mat = Material.WALL;
                         break;
                     case 'S':
-                        mat = Material.EMPTY;
+                        mat = Material.SWAMP;
                         break;
                     case 'W':
-                        mat = Material.EMPTY;
+                        mat = Material.WATER;
                         break;
                     default:
                         mat = Material.WALL;
@@ -187,17 +187,30 @@ public class Map {
                 if (this.cells[y][x].material == Material.WALL) {
                     continue;
                 }
-                if (x > 0 && this.cells[y][x - 1].material == Material.EMPTY) {
-                    this.cells[y][x].edges[0] = new MapCellEdge(this.cells[y][x], this.cells[y][x - 1], 1);
+                
+                int costEmpty = 1;
+                int costSwamp = 10;
+                int costWater = 10;
+                
+                if (x > 0 && this.cells[y][x - 1].material != Material.WALL) {
+                    Material mat = this.cells[y][x - 1].material;
+                    int cost = mat == Material.EMPTY ? costEmpty : mat == Material.SWAMP ? costSwamp : costWater;
+                    this.cells[y][x].edges[0] = new MapCellEdge(this.cells[y][x], this.cells[y][x - 1], cost);
                 }
-                if (y > 0 && this.cells[y - 1][x].material == Material.EMPTY) {
-                    this.cells[y][x].edges[1] = new MapCellEdge(this.cells[y][x], this.cells[y - 1][x], 1);
+                if (y > 0 && this.cells[y - 1][x].material != Material.WALL) {
+                    Material mat = this.cells[y - 1][x].material;
+                    int cost = mat == Material.EMPTY ? costEmpty : mat == Material.SWAMP ? costSwamp : costWater;
+                    this.cells[y][x].edges[1] = new MapCellEdge(this.cells[y][x], this.cells[y - 1][x], cost);
                 }
-                if (x < this.cells[y].length - 1 && this.cells[y][x + 1].material == Material.EMPTY) {
-                    this.cells[y][x].edges[2] = new MapCellEdge(this.cells[y][x], this.cells[y][x + 1], 1);
+                if (x < this.cells[y].length - 1 && this.cells[y][x + 1].material != Material.WALL) {
+                    Material mat = this.cells[y][x + 1].material;
+                    int cost = mat == Material.EMPTY ? costEmpty : mat == Material.SWAMP ? costSwamp : costWater;
+                    this.cells[y][x].edges[2] = new MapCellEdge(this.cells[y][x], this.cells[y][x + 1], cost);
                 }
-                if (y < this.cells.length - 1 && this.cells[y + 1][x].material == Material.EMPTY) {
-                    this.cells[y][x].edges[3] = new MapCellEdge(this.cells[y][x], this.cells[y + 1][x], 1);
+                if (y < this.cells.length - 1 && this.cells[y + 1][x].material != Material.WALL) {
+                    Material mat = this.cells[y + 1][x].material;
+                    int cost = mat == Material.EMPTY ? costEmpty : mat == Material.SWAMP ? costSwamp : costWater;
+                    this.cells[y][x].edges[3] = new MapCellEdge(this.cells[y][x], this.cells[y + 1][x], cost);
                 }
             }
         }
