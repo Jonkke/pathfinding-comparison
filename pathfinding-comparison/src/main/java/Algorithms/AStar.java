@@ -22,8 +22,6 @@ import domain.Map;
 import domain.MapCell;
 import domain.MapCellEdge;
 import domain.Material;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * A* algorithm for heuristically assisted pathfinding.
@@ -43,6 +41,10 @@ public class AStar {
 
     int startX;
     int startY;
+    private long lastRunNanoTime; // Running time of the algorithm is saved in this variable
+    private int totalCost;
+    private int cellsTraversed;
+    private int searchedCells;
 
     /**
      * Shortest route search using A* algorithm. Input the map that the search
@@ -54,16 +56,20 @@ public class AStar {
      * @param y1
      * @param x2
      * @param y2
-     * @param markSearched If true, mark searched map cells with special materials
+     * @param markSearched If true, mark searched map cells with special
+     * materials
      * @param useCrossProduct Dictates whether or not to use cross product
      * tie-breaking (results in more straight-looking paths)
-     * @param updateFn This is a callback function for the UI system, used for
-     * visualizing the algorithms progression
      * @return Ordered list of map cells that make up the shortest path. If
      * either start or target is a non-searchable cell (e.g. wall), or a route
      * does not exist, then an empty list will be returned.
      */
-    public MapCellList findShortestPath(Map map, int x1, int y1, int x2, int y2, boolean markSearched, boolean useCrossProduct, Runnable updateFn) {
+    public MapCellList findShortestPath(Map map, int x1, int y1, int x2, int y2, boolean markSearched, boolean useCrossProduct) {
+        this.lastRunNanoTime = 0;
+        this.totalCost = 0;
+        this.cellsTraversed = 0;
+        this.searchedCells = 0;
+        long startTime = System.nanoTime();
         this.startX = x1;
         this.startY = y1;
         if (!map.getCell(x1, y1).isTraversable() || !map.getCell(x2, y2).isTraversable()) {
@@ -72,7 +78,7 @@ public class AStar {
         boolean routeFound = false;
         MapCell start = map.getCell(x1, y1);
         MapCell target = map.getCell(x2, y2);
-        start.costSoFar = 0;
+        start.costFromStart = 0;
         MapCellBinaryHeap mcbh = new MapCellBinaryHeap();
         mcbh.add(start);
         while (!mcbh.isEmpty()) {
@@ -81,61 +87,66 @@ public class AStar {
                 routeFound = true;
                 break;
             }
-            if (cell.isTested) {
+            if (cell.isTested || cell.material == Material.WALL) {
                 continue;
             }
             cell.isTested = true;
+            this.searchedCells++;
             if (markSearched) {
                 cell.material = Material.SEARCHED;
             }
 
-            // Callback to passed update function is made here, if it was passed to us
-            if (updateFn != null) {
-                try {
-                    Thread.sleep(1);
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(Dijkstra.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                updateFn.run();
-            }
-
             for (MapCellEdge mce : cell.edges) {
-                if (mce == null || mce.to.isTested) {
+                if (mce == null) {
                     continue;
                 }
-                double currentCost = mce.to.costSoFar;
-                double updatedCost = cell.costSoFar + mce.cost;
-                if (!mce.to.isTested || updatedCost < currentCost) {
-                    mce.to.costSoFar = updatedCost;
+                int currentCost = mce.to.costFromStart;
+                int updatedCost = cell.costFromStart + mce.cost;
+                if (!mce.to.isTested) {
+                    mce.to.costFromStart = updatedCost;
                     double h = useCrossProduct
-                            ? getCrossProduct(mce.to.x, mce.to.y, target.x, target.y)
+                            ? getManhattanDistance(mce.to.x, mce.to.y, target.x, target.y) + getCrossProduct(mce.to.x, mce.to.y, target.x, target.y)
                             : getManhattanDistance(mce.to.x, mce.to.y, target.x, target.y);
                     mce.to.priority = updatedCost + h;
                     mcbh.add(mce.to);
                     if (markSearched) {
                         mce.to.material = Material.CANDIDATE;
                     }
+                } else if (updatedCost < currentCost) {
+                    mce.to.costFromStart = updatedCost;
+                    double h = useCrossProduct
+                            ? getManhattanDistance(mce.to.x, mce.to.y, target.x, target.y) + getCrossProduct(mce.to.x, mce.to.y, target.x, target.y)
+                            : getManhattanDistance(mce.to.x, mce.to.y, target.x, target.y);
+                    mce.to.priority = updatedCost + h;
+                    MapCell temp = mcbh.poll(); // update binary heap by removing and readding smallest MapCell
+                    mcbh.add(temp);
                 }
             }
         }
+        this.lastRunNanoTime = System.nanoTime() - startTime;
 
         // If a route was found, trace it back from the target and return traversed cells as list
         MapCellList route = new MapCellList();
+        this.totalCost = 0;
+        this.cellsTraversed = 0;
         if (!routeFound) {
+            this.lastRunNanoTime = 0;
             return route; // Route not found => empty list
         }
         MapCell curr = map.getCell(x2, y2);
+        MapCell last = null;
         while (curr != map.getCell(x1, y1)) {
-            double shortestDist = Integer.MAX_VALUE;
+            this.cellsTraversed++;
+            int shortestDist = Integer.MAX_VALUE;
             MapCell shortest = null;
-            MapCell last = null;
             for (MapCellEdge mce : curr.edges) {
                 if (mce == null) {
                     continue;
                 }
-                if (mce.to != last && mce.to.costSoFar < shortestDist) {
-                    shortestDist = mce.to.costSoFar;
+                if (mce.to != last && mce.to.costFromStart < shortestDist) {
+                    shortestDist = mce.to.costFromStart;
                     shortest = mce.to;
+                    this.totalCost += mce.cost;
                 }
             }
             last = curr;
@@ -151,7 +162,7 @@ public class AStar {
         int xDiff = Math.abs(x2 - x1);
         int yDiff = Math.abs(y2 - y1);
         int dist = (xDiff + yDiff);
-        return dist;
+        return dist * 0.98;
     }
 
     private double getCrossProduct(int x1, int y1, int x2, int y2) {
@@ -160,6 +171,38 @@ public class AStar {
         int fromStartX = this.startX - x2;
         int fromStartY = this.startY - y2;
         int cross = Math.abs(currX * fromStartY - fromStartX * currY);
-        return cross; // * 1.01;
+        return cross * 0.05;
+    }
+
+    /**
+     * Return the length of time it took to complete the last route search. The
+     * duration of the last run is measured from the point in time where the
+     * findShortestPath method was called to the point where are shortest path
+     * was found. Building of the list of cells on the route is NOT included in
+     * this measurement.
+     */
+    public long getLastRunTimeNanos() {
+        return this.lastRunNanoTime;
+    }
+
+    /**
+     * @return total cost of traversed cells
+     */
+    public int getTotalCost() {
+        return this.totalCost;
+    }
+
+    /**
+     * @return amount of cells traversed
+     */
+    public int getCellsTraversed() {
+        return this.cellsTraversed;
+    }
+
+    /**
+     * @return return the amount of cells searched during the algorithm
+     */
+    public int getSearchedCells() {
+        return this.searchedCells;
     }
 }

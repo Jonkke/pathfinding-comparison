@@ -30,7 +30,6 @@ import java.util.Random;
 import javax.swing.*;
 
 import java.awt.event.MouseMotionListener;
-import java.util.function.BiConsumer;
 
 /**
  *
@@ -38,6 +37,7 @@ import java.util.function.BiConsumer;
  */
 public class MapCanvas extends JPanel implements MouseMotionListener, MouseListener {
 
+    GUI parentGui;
     ArrayList<Object> shapes = new ArrayList();
     Random r = new Random();
     int rows, columns;
@@ -46,12 +46,6 @@ public class MapCanvas extends JPanel implements MouseMotionListener, MouseListe
     int cellHeight = 1;
     int cellWidth = 1;
     Map map;
-
-    BiConsumer bc;
-
-    public void setUpdateHook(BiConsumer bc) {
-        this.bc = bc;
-    }
 
     public void setNewMap(Map map, int width, int height) {
         this.map = map;
@@ -64,7 +58,8 @@ public class MapCanvas extends JPanel implements MouseMotionListener, MouseListe
         setBackground(Color.WHITE);
     }
 
-    public MapCanvas(int columns, int rows) {
+    public MapCanvas(GUI gui, int columns, int rows) {
+        this.parentGui = gui;
         this.addMouseMotionListener(this);
         this.columns = columns;
         this.rows = rows;
@@ -72,14 +67,15 @@ public class MapCanvas extends JPanel implements MouseMotionListener, MouseListe
         setPreferredSize(new Dimension(width, height));
     }
 
-    public MapCanvas(Map map, int width, int height) {
+    public MapCanvas(GUI gui, Map map, int width, int height) {
+        this.parentGui = gui;
         this.addMouseMotionListener(this);
         this.addMouseListener(this);
         setNewMap(map, width, height);
         setBackground(Color.WHITE);
         setPreferredSize(new Dimension(this.width, this.height));
     }
-
+    
     public void drawGrid(Graphics g) {
         g.setColor(Color.BLACK);
         for (int i = 0; i < columns - 1; i++) {
@@ -93,7 +89,6 @@ public class MapCanvas extends JPanel implements MouseMotionListener, MouseListe
     }
 
     public void drawMap(Graphics g) {
-        Graphics2D g2d = (Graphics2D) g;
         MapCell[][] cells = this.map.cells;
         for (int y = 0; y < cells.length; y++) {
             for (int x = 0; x < cells[y].length; x++) {
@@ -154,10 +149,7 @@ public class MapCanvas extends JPanel implements MouseMotionListener, MouseListe
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        if (this.bc == null) {
-            return;
-        }
-        this.bc.accept(e.getX() / cellWidth, e.getY() / cellHeight);
+        this.parentGui.setNodePos(e.getX() / cellWidth, e.getY() / cellHeight);
     }
 
     @Override

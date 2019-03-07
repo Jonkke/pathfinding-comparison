@@ -32,7 +32,7 @@ public class MapCell implements Comparable<MapCell> {
     public int x, y;
     public Material material;
     public MapCellEdge[] edges; // left, top, right, bottom
-    public double costSoFar; // Helper variable for determining distance from starting point
+    public int costFromStart; // Helper variable for determining distance from starting point
     public double priority;
     public boolean isTested;
     
@@ -41,7 +41,7 @@ public class MapCell implements Comparable<MapCell> {
         this.y = y;
         this.material = material;
         this.edges = new MapCellEdge[4];
-        this.costSoFar = Double.MAX_VALUE;
+        this.costFromStart = Integer.MAX_VALUE;
         this.isTested = false;
     }
     

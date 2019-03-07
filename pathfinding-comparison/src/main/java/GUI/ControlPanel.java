@@ -16,13 +16,13 @@
  */
 package GUI;
 
-import GUI.GUI.GUIState;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -35,23 +35,41 @@ import javax.swing.UIManager;
  */
 public class ControlPanel extends JPanel implements ActionListener {
 
+    GUI parentGui;
+
     int panelWidth;
-    GUIState state;
     JLabel loadMapLabel;
     JLabel nodeSelectLabel;
     JLabel algoSelectLabel;
+    JLabel aStarSettings;
+    JLabel routeInfo;
     JButton loadMapBtn;
     JButton startPosBtn;
     JButton endPosBtn;
     JButton dijkstraBtn;
     JButton aStarBtn;
+    JButton searchedAreaBtn;
     JFileChooser fileChooser;
+    JCheckBox useCrossProductTieBreaking;
 
-    public ControlPanel(GUIState state) {
-        panelWidth = 200;
-        this.state = state;
+    // Route info labels
+    JLabel routeCellsTraversed;
+    JLabel routeTotalCost;
+    JLabel routeTimeMs;
+    JLabel cellsSearched;
+
+    JLabel divisor;
+
+    public ControlPanel(GUI parentGui) {
+        this.parentGui = parentGui;
+        panelWidth = 300;
 
         this.setPreferredSize(new Dimension(panelWidth, 200));
+
+        // Divisor thingy
+        this.divisor = new JLabel(" ");
+        this.divisor.setPreferredSize(new Dimension(panelWidth, 100));
+        this.divisor.setHorizontalAlignment(SwingConstants.CENTER);
 
         // Map loading
         this.loadMapLabel = new JLabel("Load map");
@@ -99,7 +117,52 @@ public class ControlPanel extends JPanel implements ActionListener {
         this.add(dijkstraBtn);
         this.add(aStarBtn);
 
-        // File chooser
+        // Show | hide searched area switch
+        this.searchedAreaBtn = new JButton("Show searched");
+        this.searchedAreaBtn.setActionCommand("SwitchSearched");
+        this.searchedAreaBtn.addActionListener(this);
+        this.searchedAreaBtn.setPreferredSize(new Dimension(panelWidth / 2, 25));
+        this.add(searchedAreaBtn);
+
+        // A* specific settings
+        this.aStarSettings = new JLabel("A* settings");
+        this.aStarSettings.setPreferredSize(new Dimension(panelWidth, 20));
+        this.aStarSettings.setHorizontalAlignment(SwingConstants.CENTER);
+        this.add(this.aStarSettings);
+
+        this.useCrossProductTieBreaking = new JCheckBox("Use tie-breaking");
+        this.useCrossProductTieBreaking.setSelected(false);
+        this.useCrossProductTieBreaking.setActionCommand("SetCPTieBreaking");
+        this.useCrossProductTieBreaking.addActionListener(this);
+        this.add(this.useCrossProductTieBreaking);
+
+        // Divisor
+        this.add(this.divisor);
+        
+        // Route info
+        this.routeInfo = new JLabel("Route Info:");
+        this.routeInfo.setPreferredSize(new Dimension(panelWidth, 20));
+        this.routeInfo.setHorizontalAlignment(SwingConstants.CENTER);
+        this.add(this.routeInfo);
+
+        this.routeCellsTraversed = new JLabel("No route to display...");
+        this.routeCellsTraversed.setPreferredSize(new Dimension(panelWidth, 20));
+        this.routeCellsTraversed.setHorizontalAlignment(SwingConstants.CENTER);
+        this.routeTotalCost = new JLabel("");
+        this.routeTotalCost.setPreferredSize(new Dimension(panelWidth, 20));
+        this.routeTotalCost.setHorizontalAlignment(SwingConstants.CENTER);
+        this.routeTimeMs = new JLabel("");
+        this.routeTimeMs.setPreferredSize(new Dimension(panelWidth, 20));
+        this.routeTimeMs.setHorizontalAlignment(SwingConstants.CENTER);
+        this.cellsSearched = new JLabel("");
+        this.cellsSearched.setPreferredSize(new Dimension(panelWidth, 20));
+        this.cellsSearched.setHorizontalAlignment(SwingConstants.CENTER);
+        this.add(routeCellsTraversed);
+        this.add(routeTotalCost);
+        this.add(routeTimeMs);
+        this.add(cellsSearched);
+
+        // File chooser popup
         this.fileChooser = new JFileChooser();
     }
 
@@ -110,26 +173,45 @@ public class ControlPanel extends JPanel implements ActionListener {
         if (ac.equals("SetStartPos")) {
             this.startPosBtn.setBackground(Color.lightGray);
             this.endPosBtn.setBackground(defBtnColor);
-            this.state.nodeToSet = 1;
+            this.parentGui.nodeToSet = 1;
         } else if (ac.equals("SetEndPos")) {
             this.startPosBtn.setBackground(defBtnColor);
             this.endPosBtn.setBackground(Color.lightGray);
-            this.state.nodeToSet = 2;
+            this.parentGui.nodeToSet = 2;
         } else if (ac.equals("Dijkstra")) {
             this.dijkstraBtn.setBackground(Color.lightGray);
             this.aStarBtn.setBackground(defBtnColor);
-            this.state.algo = 1;
+            this.parentGui.activeAlgorithm = 1;
+            this.parentGui.findAndDrawRoute();
         } else if (ac.equals("Astar")) {
             this.dijkstraBtn.setBackground(defBtnColor);
             this.aStarBtn.setBackground(Color.lightGray);
-            this.state.algo = 2;
+            this.parentGui.activeAlgorithm = 2;
+            this.parentGui.findAndDrawRoute();
+        } else if (ac.equals("SwitchSearched")) {
+            this.parentGui.switchSearchedVisibility();
+            if (this.searchedAreaBtn.getText().equals("Show searched")) {
+                this.searchedAreaBtn.setText("Hide searched");
+            } else {
+                this.searchedAreaBtn.setText("Show searched");
+            }
+        } else if (ac.equals("SetCPTieBreaking")) {
+            this.parentGui.crossProductTieBreaking = this.useCrossProductTieBreaking.isSelected();
+            this.parentGui.findAndDrawRoute();
         } else if (ac.equals("LoadMap")) {
             int returnVal = this.fileChooser.showOpenDialog(this);
             if (returnVal == JFileChooser.APPROVE_OPTION) {
                 File file = this.fileChooser.getSelectedFile();
-                this.state.setMapFilePath(file.getAbsolutePath());
+                this.parentGui.newMap(file.getAbsolutePath());
             }
         }
+    }
+
+    public void updateRouteInfo(int cellsTraversed, int totalCost, int timeMs, int cellsSearched) {
+        this.routeCellsTraversed.setText("Cells traversed: " + cellsTraversed);
+        this.routeTotalCost.setText("Total cost: " + totalCost);
+        this.routeTimeMs.setText("Time in ms: " + timeMs);
+        this.cellsSearched.setText("Cells searched: " + cellsSearched);
     }
 
 }

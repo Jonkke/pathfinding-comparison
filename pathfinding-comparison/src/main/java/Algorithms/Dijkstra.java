@@ -22,8 +22,6 @@ import domain.Map;
 import domain.MapCell;
 import domain.MapCellEdge;
 import domain.Material;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Dijkstra's algorithm for shortest path. This class is a container for the
@@ -36,6 +34,11 @@ import java.util.logging.Logger;
  */
 public class Dijkstra {
 
+    private long lastRunNanoTime; // Running time of the algorithm is saved in this variable
+    private int totalCost;
+    private int cellsTraversed;
+    private int searchedCells;
+
     /**
      * Shortest route search using Dijkstra's algorithm. Input the map that the
      * search is to be run on, and the starting x and y coordinates (x1,y1),
@@ -46,19 +49,23 @@ public class Dijkstra {
      * @param y1
      * @param x2
      * @param y2
-     * @param markSearched If true, mark searched map cells with special materials
-     * @param updateFn This is a callback function for the UI system, used
-     * for visualizing the algorithms progression
+     * @param markSearched If true, mark searched map cells with special
+     * materials
      * @return Ordered list of map cells that make up the shortest path. If
      * either start or target is a non-searchable cell (e.g. wall), or a route
      * does not exist, then an empty list will be returned.
      */
-    public MapCellList findShortestPath(Map map, int x1, int y1, int x2, int y2, boolean markSearched, Runnable updateFn) {
+    public MapCellList findShortestPath(Map map, int x1, int y1, int x2, int y2, boolean markSearched) {
+        long startTime = System.nanoTime();
+        this.lastRunNanoTime = 0;
+        this.totalCost = 0;
+        this.cellsTraversed = 0;
+        this.searchedCells = 0;
         if (!map.getCell(x1, y1).isTraversable() || !map.getCell(x2, y2).isTraversable()) {
             return new MapCellList(); // Start or end of route blocked by wall => empty list
         }
         MapCell start = map.getCell(x1, y1);
-        start.costSoFar = 0;
+        start.costFromStart = 0;
         boolean routeFound = false;
         MapCellBinaryHeap mcbh = new MapCellBinaryHeap();
         mcbh.add(start);
@@ -68,30 +75,22 @@ public class Dijkstra {
                 routeFound = true;
                 break;
             }
-            if (cell.isTested) {
+            if (cell.isTested || cell.material == Material.WALL) {
                 continue;
             }
             cell.isTested = true;
+            this.searchedCells++;
             if (markSearched) {
                 cell.material = Material.SEARCHED;
             }
-            if (updateFn != null) {
-                try {
-                    Thread.sleep(1);
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(Dijkstra.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                updateFn.run();
-            }
-
             for (MapCellEdge mce : cell.edges) {
                 if (mce == null) {
                     continue;
                 }
-                double currentDistance = mce.to.costSoFar;
-                double updatedDistance = cell.costSoFar + mce.cost;
+                int currentDistance = mce.to.costFromStart;
+                int updatedDistance = cell.costFromStart + mce.cost;
                 if (updatedDistance < currentDistance) {
-                    mce.to.costSoFar = updatedDistance;
+                    mce.to.costFromStart = updatedDistance;
                     mce.to.priority = updatedDistance;
                     mcbh.add(mce.to);
                     if (markSearched) {
@@ -100,24 +99,30 @@ public class Dijkstra {
                 }
             }
         }
+        this.lastRunNanoTime = System.nanoTime() - startTime;
 
         // If a route was found, trace it back from the target and return traversed cells as list
         MapCellList route = new MapCellList();
+        this.totalCost = 0;
+        this.cellsTraversed = 0;
         if (!routeFound) {
+            this.lastRunNanoTime = 0;
             return route; // Route not fonud => empty list
         }
         MapCell curr = map.getCell(x2, y2);
+        MapCell last = null;
         while (curr != map.getCell(x1, y1)) {
-            double shortestDist = Double.MAX_VALUE;
+            this.cellsTraversed++;
+            int shortestDist = Integer.MAX_VALUE;
             MapCell shortest = null;
-            MapCell last = null;
             for (MapCellEdge mce : curr.edges) {
                 if (mce == null) {
                     continue;
                 }
-                if (mce.to != last && mce.to.costSoFar < shortestDist) {
-                    shortestDist = mce.to.costSoFar;
+                if (mce.to != last && mce.to.costFromStart < shortestDist) {
+                    shortestDist = mce.to.costFromStart;
                     shortest = mce.to;
+                    this.totalCost += mce.cost;
                 }
             }
             last = curr;
@@ -127,6 +132,38 @@ public class Dijkstra {
         route.add(curr);
 
         return route;
+    }
+
+    /**
+     * Return the length of time it took to complete the last route search. The
+     * duration of the last run is measured from the point in time where the
+     * findShortestPath method was called to the point where are shortest path
+     * was found. Building of the list of cells on the route is NOT included in
+     * this measurement.
+     */
+    public long getLastRunTimeNanos() {
+        return this.lastRunNanoTime;
+    }
+
+    /**
+     * @return total cost of traversed cells
+     */
+    public int getTotalCost() {
+        return this.totalCost;
+    }
+
+    /**
+     * @return amount of cells traversed
+     */
+    public int getCellsTraversed() {
+        return this.cellsTraversed;
+    }
+
+    /**
+     * @return return the amount of cells searched during the algorithm
+     */
+    public int getSearchedCells() {
+        return this.searchedCells;
     }
 
 }

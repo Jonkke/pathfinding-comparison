@@ -175,7 +175,7 @@ public class Map {
             for (int x = 0; x < this.cells[y].length; x++) {
                 this.cells[y][x].material = this.cleanMats[y][x];
                 this.cells[y][x].isTested = false;
-                this.cells[y][x].costSoFar = Integer.MAX_VALUE;
+                this.cells[y][x].costFromStart = Integer.MAX_VALUE;
             }
         }
     }
@@ -187,11 +187,11 @@ public class Map {
                 if (this.cells[y][x].material == Material.WALL) {
                     continue;
                 }
-                
+
                 int costEmpty = 1;
-                int costSwamp = 10;
-                int costWater = 10;
-                
+                int costSwamp = 3;
+                int costWater = 5;
+
                 if (x > 0 && this.cells[y][x - 1].material != Material.WALL) {
                     Material mat = this.cells[y][x - 1].material;
                     int cost = mat == Material.EMPTY ? costEmpty : mat == Material.SWAMP ? costSwamp : costWater;
