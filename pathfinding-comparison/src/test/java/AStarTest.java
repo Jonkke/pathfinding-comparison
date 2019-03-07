@@ -57,5 +57,14 @@ public class AStarTest {
         MapCellList path = as.findShortestPath(map, 0, 0, 3, 4, false, false);
         assertEquals(path.size(), 0);
     }
+    
+    @Test
+    public void testRouteOnArenaMap() {
+        map =  new Map("./maps/arena2.map");
+        as.findShortestPath(map, 98, 6, 229, 182, false, false);
+        assertEquals(as.getSearchedCells(), 7993);
+        assertEquals(as.getTotalCost(), 510);
+        assertEquals(as.getCellsTraversed(), 351);
+    }
 
 }

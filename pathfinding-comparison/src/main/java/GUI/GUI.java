@@ -135,7 +135,8 @@ public class GUI {
             MapCell cell = route.get(i);
             cell.material = Material.ROUTE;
         }
-        this.controlPanel.updateRouteInfo(cellsTraversed, totalCost, timeMs, cellsSearched);
+        int[] startEnd = {startX, startY, endX, endY};
+        this.controlPanel.updateRouteInfo(startEnd, cellsTraversed, totalCost, timeMs, cellsSearched);
         this.mapCanvas.repaint();
         this.mapCanvas.revalidate();
     }

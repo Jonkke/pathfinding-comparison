@@ -53,6 +53,7 @@ public class ControlPanel extends JPanel implements ActionListener {
     JCheckBox useCrossProductTieBreaking;
 
     // Route info labels
+    JLabel startAndEndCells;
     JLabel routeCellsTraversed;
     JLabel routeTotalCost;
     JLabel routeTimeMs;
@@ -138,7 +139,7 @@ public class ControlPanel extends JPanel implements ActionListener {
 
         // Divisor
         this.add(this.divisor);
-        
+
         // Route info
         this.routeInfo = new JLabel("Route Info:");
         this.routeInfo.setPreferredSize(new Dimension(panelWidth, 20));
@@ -148,6 +149,9 @@ public class ControlPanel extends JPanel implements ActionListener {
         this.routeCellsTraversed = new JLabel("No route to display...");
         this.routeCellsTraversed.setPreferredSize(new Dimension(panelWidth, 20));
         this.routeCellsTraversed.setHorizontalAlignment(SwingConstants.CENTER);
+        this.startAndEndCells = new JLabel("");
+        this.startAndEndCells.setPreferredSize(new Dimension(panelWidth, 20));
+        this.startAndEndCells.setHorizontalAlignment(SwingConstants.CENTER);
         this.routeTotalCost = new JLabel("");
         this.routeTotalCost.setPreferredSize(new Dimension(panelWidth, 20));
         this.routeTotalCost.setHorizontalAlignment(SwingConstants.CENTER);
@@ -157,6 +161,7 @@ public class ControlPanel extends JPanel implements ActionListener {
         this.cellsSearched = new JLabel("");
         this.cellsSearched.setPreferredSize(new Dimension(panelWidth, 20));
         this.cellsSearched.setHorizontalAlignment(SwingConstants.CENTER);
+        this.add(startAndEndCells);
         this.add(routeCellsTraversed);
         this.add(routeTotalCost);
         this.add(routeTimeMs);
@@ -207,7 +212,8 @@ public class ControlPanel extends JPanel implements ActionListener {
         }
     }
 
-    public void updateRouteInfo(int cellsTraversed, int totalCost, int timeMs, int cellsSearched) {
+    public void updateRouteInfo(int[] startEndPos, int cellsTraversed, int totalCost, int timeMs, int cellsSearched) {
+        this.startAndEndCells.setText("Start: (" + startEndPos[0] + "," + startEndPos[1] + "), End: (" + startEndPos[2] + "," + startEndPos[3] + ")");
         this.routeCellsTraversed.setText("Cells traversed: " + cellsTraversed);
         this.routeTotalCost.setText("Total cost: " + totalCost);
         this.routeTimeMs.setText("Time in ms: " + timeMs);

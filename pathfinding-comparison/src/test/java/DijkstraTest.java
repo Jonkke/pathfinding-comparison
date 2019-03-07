@@ -58,4 +58,13 @@ public class DijkstraTest {
         assertEquals(path.size(), 0);
     }
 
+    @Test
+    public void testRouteOnArenaMap() {
+        map = new Map("./maps/arena2.map");
+        d.findShortestPath(map, 98, 6, 229, 182, false);
+        assertEquals(d.getSearchedCells(), 23148);
+        assertEquals(d.getTotalCost(), 511);
+        assertEquals(d.getCellsTraversed(), 351);
+    }
+
 }

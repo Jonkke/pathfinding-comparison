@@ -32,7 +32,8 @@ import javax.swing.*;
 import java.awt.event.MouseMotionListener;
 
 /**
- *
+ * This class is responsible for drawing the map on the GUI.
+ * 
  * @author Jonkke
  */
 public class MapCanvas extends JPanel implements MouseMotionListener, MouseListener {
