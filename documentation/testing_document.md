@@ -21,6 +21,3 @@ Dijkstra and AStar algorithm also have some basic unit tests written for them. O
 
 ## Performance testing
 Performance testing document can be fonud in a separate file.
-
-## Code & testing coverage
-Still to be implemented...
