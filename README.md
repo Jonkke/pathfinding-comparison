@@ -10,7 +10,7 @@ To build the project, `cd` in to the "pathfinding-comparison" folder, then run `
 ## Documentation
 
 ### [Project definition](https://github.com/Jonkke/pathfinding-comparison/blob/master/documentation/definition.md)
-### [Implementation](https://github.com/Jonkke/pathfinding-comparison/blob/master/documentation/implemention.md)
+### [Implementation](https://github.com/Jonkke/pathfinding-comparison/blob/master/documentation/implementation.md)
 ### [Testing document](https://github.com/Jonkke/pathfinding-comparison/blob/master/documentation/testing_document.md)
 ### [Performance documentation](https://github.com/Jonkke/pathfinding-comparison/blob/master/documentation/performance.md)
 
