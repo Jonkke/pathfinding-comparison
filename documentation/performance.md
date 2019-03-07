@@ -37,4 +37,4 @@ Run 1 (A*): (85,87)->(439, 403), 728, 1279, 97138, 25ms
 
 \*maps with water materials cause some oddities with this implementation, causing Dijkstra to find paths with greater than optimal costs.
 
-In general, it can be seen that the A* algorithm is generally more effective both time-wise and memory-wise (considering how many cells need to be searched). However, the difference in time is not necessarily vrey drastic, even though the amount of searched cells could be substantially lower. This may be in part due to implementation details, but the difference is still clearly visible.
+In general, it can be seen that the A* algorithm is generally more effective both time-wise and memory-wise (considering how many cells need to be searched). However, the difference in completion time is not necessarily very drastic, even though the amount of searched cells could be substantially lower. This may be in part due to implementation details, but the difference is still clearly visible.

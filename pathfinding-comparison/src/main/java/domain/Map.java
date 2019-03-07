@@ -105,7 +105,7 @@ public class Map {
      *
      * . - passable terrain G - passable terrain
      *
-     * @ - out of bounds O - out of bounds T - trees (unpassable) S - swamp
+     * {@literal @} - out of bounds O - out of bounds T - trees (unpassable) S - swamp
      * (passable from regular terrain) W - water (traversable, but not passable
      * from terrain)
      *
