@@ -5,9 +5,9 @@ A project conducted as part of a university course. Used to test pathfinding alg
 ## Setup & Usage instructions
 
 This project uses Java 8 and Gradle 5. Make sure you have those installed. Then clone this repository.
-To build the project, `cd` in to the "pathfinding-comparison" folder, then run `gradle build`. This will create a .jar file in build/libs folder, that you can use to run the application.
+To build the project, `cd` to the "pathfinding-comparison" folder, then run `gradle build`. This will create a .jar file in build/libs folder, that you can use to run the application.
 
-The usage of the app itself is quite straightforward. You simply load a map (or use the default empty map), then pick start and end points on the map, and the selected algorithm will find the shortest available path. You can choose to show or hide the searched area, and for A* algorithm you can choose to use a cross product tie-breaking extension (not 100% working, as it may not give optimal route). The details of the last search are shown in the control panel.
+The usage of the app itself is quite straightforward. You simply load a map (or use the default empty map), then pick start and end points on the map, and the currently selected algorithm will find the shortest available path. You can choose to show or hide the searched area, and for A* algorithm you can choose to use a cross product tie-breaking extension (not 100% working, as it may not give optimal route). The details of the last search are shown in the control panel.
 
 There are some maps included with the project that you can try, or you can download new ones from the [Moving AI Labs 2D Pathfinding Benchmarks site](https://movingai.com/benchmarks/grids.html). Drawing maps is currently not supported.
 
